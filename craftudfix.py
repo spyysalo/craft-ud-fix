@@ -74,7 +74,12 @@ def fix_feature_column(words):
 
 
 def map_upos_column(words):
-    pass # TODO
+    "Convert the pos tags from penn to universal"
+    penn_tags = ['#', '$', '"', ',', '-LRB-', '-RRB-', '.', ':', 'AFX', 'CC', 'CD', 'DT', 'EX', 'FW', 'HYPH', 'IN', 'JJ', 'JJR', 'JJS', 'LS', 'MD', 'NIL', 'NN', 'NNP', 'NNPS', 'NNS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO', 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB', '``']
+    universal_tags = ['SYM', 'SYM', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'ADJ', 'CCONJ', 'NUM', 'DET', 'PRON', 'X', 'PUNCT', 'ADP', 'ADJ', 'ADJ', 'ADJ', 'X', 'VERB', 'X', 'NOUN', 'PROPN', 'PROPN', 'NOUN', 'DET', 'PART', 'PRON', 'DET', 'ADV', 'ADV', 'ADV', 'ADP', 'SYM', 'PART', 'INTJ', 'VERB', 'VERB', 'VERB', 'VERB', 'VERB', 'VERB', 'DET', 'PRON', 'DET', 'ADV', 'PUNCT']
+    for w in words:
+        tag_id = [id for id, tag in enumerate(penn_tags) if w.upos == tag][0]
+        w.upos = universal_tags[tag_id]
 
 
 def main(argv):
