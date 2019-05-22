@@ -7,6 +7,58 @@ import re
 from logging import warning, info
 
 
+# https://universaldependencies.org/tagset-conversion/en-penn-uposf.html
+PTB_UPOS_MAP = {
+    '#': 'SYM',
+    '$': 'SYM',
+    "''": 'PUNCT',
+    ',': 'PUNCT',
+    '-LRB-': 'PUNCT',
+    '-RRB-': 'PUNCT',
+    '.': 'PUNCT',
+    ':': 'PUNCT',
+    'AFX': 'ADJ',
+    'CC': 'CCONJ',
+    'CD': 'NUM',
+    'DT': 'DET',
+    'EX': 'PRON',
+    'FW': 'X',
+    'HYPH': 'PUNCT',
+    'IN': 'ADP',
+    'JJ': 'ADJ',
+    'JJR': 'ADJ',
+    'JJS': 'ADJ',
+    'LS': 'X',
+    'MD': 'VERB',
+    'NIL': 'X',
+    'NN': 'NOUN',
+    'NNP': 'PROPN',
+    'NNPS': 'PROPN',
+    'NNS': 'NOUN',
+    'PDT': 'DET',
+    'POS': 'PART',
+    'PRP': 'PRON',
+    'PRP$': 'DET',
+    'RB': 'ADV',
+    'RBR': 'ADV',
+    'RBS': 'ADV',
+    'RP': 'ADP',
+    'SYM': 'SYM',
+    'TO': 'PART',
+    'UH': 'INTJ',
+    'VB': 'VERB',
+    'VBD': 'VERB',
+    'VBG': 'VERB',
+    'VBN': 'VERB',
+    'VBP': 'VERB',
+    'VBZ': 'VERB',
+    'WDT': 'DET',
+    'WP': 'PRON',
+    'WP$': 'DET',
+    'WRB': 'ADV',
+    '``': 'PUNCT'
+}
+
 class Word(object):
     def __init__(self, id_, form, lemma, upos, xpos, feats, head, deprel,
                  deps, misc):
@@ -74,12 +126,9 @@ def fix_feature_column(words):
 
 
 def map_upos_column(words):
-    "Convert the pos tags from penn to universal"
-    penn_tags = ['#', '$', '"', ',', '-LRB-', '-RRB-', '.', ':', 'AFX', 'CC', 'CD', 'DT', 'EX', 'FW', 'HYPH', 'IN', 'JJ', 'JJR', 'JJS', 'LS', 'MD', 'NIL', 'NN', 'NNP', 'NNPS', 'NNS', 'PDT', 'POS', 'PRP', 'PRP$', 'RB', 'RBR', 'RBS', 'RP', 'SYM', 'TO', 'UH', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'WDT', 'WP', 'WP$', 'WRB', '``']
-    universal_tags = ['SYM', 'SYM', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'PUNCT', 'ADJ', 'CCONJ', 'NUM', 'DET', 'PRON', 'X', 'PUNCT', 'ADP', 'ADJ', 'ADJ', 'ADJ', 'X', 'VERB', 'X', 'NOUN', 'PROPN', 'PROPN', 'NOUN', 'DET', 'PART', 'PRON', 'DET', 'ADV', 'ADV', 'ADV', 'ADP', 'SYM', 'PART', 'INTJ', 'VERB', 'VERB', 'VERB', 'VERB', 'VERB', 'VERB', 'DET', 'PRON', 'DET', 'ADV', 'PUNCT']
+    """Convert the UPOS column tags from Penn to UD."""
     for w in words:
-        tag_id = [id for id, tag in enumerate(penn_tags) if w.upos == tag][0]
-        w.upos = universal_tags[tag_id]
+        w.upos = PTB_UPOS_MAP.get(w.upos, w.upos)
 
 
 def main(argv):
