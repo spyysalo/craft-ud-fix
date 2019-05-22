@@ -83,6 +83,8 @@ class Word(object):
 def argparser():
     from argparse import ArgumentParser
     ap = ArgumentParser(description='Fix CRAFT corpus .conllu data')
+    ap.add_argument('-v31', default=False, action='store_true',
+                    help='apply fixes specific to CRAFT v3.1')
     ap.add_argument('conllu', nargs='+', help='CoNLL-U files')
     return ap
 
@@ -136,8 +138,9 @@ def main(argv):
     for fn in args.conllu:
         with open(fn) as f:
             for comments, words in read_sentences(f):
-                fix_feature_column(words)
-                map_upos_column(words)
+                if args.v31:
+                    fix_feature_column(words)
+                    map_upos_column(words)
                 write_sentence(comments, words)
 
 
