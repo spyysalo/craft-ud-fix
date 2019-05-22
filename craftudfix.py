@@ -133,6 +133,13 @@ def map_upos_column(words):
         w.upos = PTB_UPOS_MAP.get(w.upos, w.upos)
 
 
+def remove_extra_whitespace(words):
+    """Remove initial and trailing whitespace from FORM and LEMMA columns."""
+    for w in words:
+        w.form = w.form.strip()
+        w.lemma = w.lemma.strip()
+
+
 def main(argv):
     args = argparser().parse_args(argv[1:])
     for fn in args.conllu:
@@ -141,6 +148,7 @@ def main(argv):
                 if args.v31:
                     fix_feature_column(words)
                     map_upos_column(words)
+                remove_extra_whitespace(words)
                 write_sentence(comments, words)
 
 
