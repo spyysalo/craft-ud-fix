@@ -59,6 +59,10 @@ PTB_UPOS_MAP = {
     '``': 'PUNCT'
 }
 
+
+NUMBER_RE = re.compile(r'^-?\.?[0-9][0-9,.−-]+$')
+
+
 class Word(object):
     def __init__(self, id_, form, lemma, upos, xpos, feats, head, deprel,
                  deps, misc):
@@ -83,6 +87,8 @@ class Word(object):
 def argparser():
     from argparse import ArgumentParser
     ap = ArgumentParser(description='Fix CRAFT corpus .conllu data')
+    ap.add_argument('-n', '--number-lemmas', default=False, action='store_true',
+                    help='apply heuristic fixes to the lemmas of numbers')
     ap.add_argument('-v31', default=False, action='store_true',
                     help='apply fixes specific to CRAFT v3.1')
     ap.add_argument('conllu', nargs='+', help='CoNLL-U files')
@@ -140,6 +146,22 @@ def remove_extra_whitespace(words):
         w.lemma = w.lemma.strip()
 
 
+def is_number(form):
+    return form.isdigit() or NUMBER_RE.match(form)
+
+
+def fix_number_lemmas(words):
+    """Replace LEMMA "0" with FORM for numbers."""
+    # At least in CRAFT-3.1.2 data, the LEMMA is "0" for numbers.
+    # This isn't strictly an error, but differs from UD convention (in
+    # UDv2.4 data, there are 122,118 FORMS matching '^[0-9]+$', of these,
+    # 116,421 have identical LEMMA and FORM) and causes problems at least
+    # for UDPipe: https://github.com/ufal/udpipe/issues/53
+    for w in words:
+        if w.lemma == '0' and is_number(w.form):
+            w.lemma = w.form
+
+
 def main(argv):
     args = argparser().parse_args(argv[1:])
     for fn in args.conllu:
@@ -149,6 +171,8 @@ def main(argv):
                     fix_feature_column(words)
                     map_upos_column(words)
                 remove_extra_whitespace(words)
+                if args.number_lemmas:
+                    fix_number_lemmas(words)
                 write_sentence(comments, words)
 
 
